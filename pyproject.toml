@@ -12,6 +12,9 @@ dependencies = [
   "APScheduler>=3.10,<4",
 ]
 
+[project.scripts]
+announce-watcher = "announce_watcher.app:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
