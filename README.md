@@ -4,7 +4,7 @@
 
 ## 이번 변경 핵심
 
-- `kpu.kdual.net`처럼 **게시판 URL로 진입하면 `Account/Index/?returnUrl=...` 로그인 페이지로 이동하는 사이트**를 위해 `playwright_login_board` 어댑터를 보강했습니다.
+- `kpu.kdual.net`처럼 **로그인 페이지에서 아이디/비밀번호 입력 후 버튼 클릭**이 필요한 사이트를 위해 `playwright_login_board` 어댑터를 추가했습니다.
 - `eclass.tukorea.ac.kr`처럼 **홈 진입 → 안내 팝업 확인 → 우측 상단 로그인 버튼 클릭 → 로그인 폼 입력 → 과목 선택 팝업에서 원하는 과목 선택** 흐름이 필요한 사이트도 Playwright 어댑터로 처리할 수 있게 했습니다.
 - eclass는 이제 단순 URL 접근이 아니라, **과목 컨텍스트 선택(`#eclass_subject_change` → `#subject_room` → `.roomGo`)**까지 설정으로 처리합니다.
 
@@ -86,7 +86,7 @@ announce-watcher
 3. 비밀번호 입력
 4. 로그인 버튼 클릭
 
-이제 기본 설정은 실제 KDUAL 로그인 URL 형식인 `https://kpu.kdual.net/Account/Index/?returnUrl={start_url}`를 사용하고, 잘못된 `/login` 경로로 강제 이동하지 않습니다.
+위 흐름에 맞춰 Playwright 셀렉터를 넣었습니다.
 
 ### eclass (`eclass.tukorea.ac.kr`)
 
@@ -136,9 +136,6 @@ eclass 항목은 아래 설정을 사용합니다.
 2. 팝업 과목명 텍스트가 실제 값과 조금이라도 다르면 선택이 실패할 수 있습니다.
 3. 사이트 구조가 바뀌면 셀렉터를 수정해야 합니다.
 4. 처음 디버깅할 때는 `headless: false`로 두고 눈으로 브라우저 동작을 확인하는 것을 권장합니다.
-
-- KDUAL은 `login_url`을 `https://kpu.kdual.net/Account/Index/?returnUrl={start_url}` 형식으로 써야 합니다. 기존 `/login`은 404라서 동작하지 않습니다.
-- KDUAL 기본 셀렉터는 `input[name="txtID"]`, `input[name="txtPWD"]` 계열과 placeholder/text fallback을 함께 사용합니다.
 
 ## 테스트
 

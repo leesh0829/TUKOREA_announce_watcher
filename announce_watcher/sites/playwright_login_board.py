@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from urllib.parse import quote
-
 from announce_watcher.sites.tukorea_board import TukoreaBoardAdapter
 
 
@@ -38,13 +36,14 @@ class PlaywrightLoginBoardAdapter(TukoreaBoardAdapter):
     def login(self) -> None:
         page = self._ensure_page()
         start_url = self.config.settings.get("start_url") or self.config.settings.get("board_url")
+        login_url = self.config.settings.get("login_url")
+        login_button_selector = self.config.settings.get("login_button_selector")
         username_selector = self.config.settings.get("username_selector")
         password_selector = self.config.settings.get("password_selector")
         submit_selector = self.config.settings.get("submit_selector")
         username = self.config.settings.get("username")
         password = self.config.settings.get("password")
         wait_until = self.config.settings.get("wait_until", "networkidle")
-        login_timeout_ms = int(float(self.config.settings.get("login_timeout_seconds", 20)) * 1000)
 
         if username is None or password is None:
             raise ValueError("Playwright adapter requires settings.username and settings.password")
@@ -55,10 +54,12 @@ class PlaywrightLoginBoardAdapter(TukoreaBoardAdapter):
 
         page.goto(start_url, wait_until=wait_until)
 
-        if not self._has_login_form(page, username_selector, password_selector):
-            self._open_login_view(page, start_url, wait_until)
+        if login_button_selector:
+            page.locator(login_button_selector).first.click()
 
-        self._wait_for_login_form(page, username_selector, password_selector, login_timeout_ms)
+        if login_url and page.url != login_url:
+            page.goto(login_url, wait_until=wait_until)
+
         page.locator(username_selector).first.fill(str(username))
         page.locator(password_selector).first.fill(str(password))
         page.locator(submit_selector).first.click()
@@ -71,40 +72,6 @@ class PlaywrightLoginBoardAdapter(TukoreaBoardAdapter):
         board_url = self.config.settings["board_url"]
         page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
         return self.parse_notice_list(page.content(), board_url)
-
-    def _open_login_view(self, page, start_url: str, wait_until: str) -> None:
-        login_button_selector = self.config.settings.get("login_button_selector")
-        if login_button_selector and self._selector_exists(page, login_button_selector):
-            page.locator(login_button_selector).first.click()
-            if self._has_login_form(page, self.config.settings["username_selector"], self.config.settings["password_selector"]):
-                return
-
-        login_url = self._resolve_login_url(start_url)
-        if login_url:
-            page.goto(login_url, wait_until=wait_until)
-
-    def _resolve_login_url(self, start_url: str) -> str | None:
-        login_url = self.config.settings.get("login_url")
-        if login_url:
-            return str(login_url).format(return_url=quote(start_url, safe=""), start_url=start_url)
-
-        if "kdual.net" in start_url:
-            return f"https://kpu.kdual.net/Account/Index/?returnUrl={quote(start_url, safe=':/?=&')}"
-        return None
-
-    @staticmethod
-    def _selector_exists(page, selector: str) -> bool:
-        try:
-            return page.locator(selector).first.count() > 0
-        except Exception:  # pragma: no cover - defensive for optional Playwright runtime
-            return False
-
-    def _has_login_form(self, page, username_selector: str, password_selector: str) -> bool:
-        return self._selector_exists(page, username_selector) and self._selector_exists(page, password_selector)
-
-    def _wait_for_login_form(self, page, username_selector: str, password_selector: str, timeout_ms: int) -> None:
-        page.locator(username_selector).first.wait_for(state="visible", timeout=timeout_ms)
-        page.locator(password_selector).first.wait_for(state="visible", timeout=timeout_ms)
 
     def _select_course_context_if_needed(self, page) -> None:
         course_name = self.config.settings.get("course_name")
