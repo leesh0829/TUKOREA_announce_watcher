@@ -73,28 +73,33 @@ def main(argv: Sequence[str] | None = None) -> None:
         print("No enabled sites configured.")
         return
 
-    for adapter in adapters:
-        count = engine.check_site(adapter)
-        logger.info("Checked %s: %s new notices", adapter.config.name, count)
-        print(f"[CHECK] {adapter.config.name}: {count} new notices")
+    try:
+        for adapter in adapters:
+            count = engine.check_site(adapter)
+            logger.info("Checked %s: %s new notices", adapter.config.name, count)
+            print(f"[CHECK] {adapter.config.name}: {count} new notices")
 
-    if args.once:
+        if args.once:
+            return
+
+        from apscheduler.schedulers.blocking import BlockingScheduler
+
+        scheduler = BlockingScheduler()
+        for adapter in adapters:
+            scheduler.add_job(
+                engine.check_site,
+                "interval",
+                seconds=adapter.config.interval_seconds,
+                args=[adapter],
+                id=adapter.config.name,
+                replace_existing=True,
+            )
+
+        scheduler.start()
+    except KeyboardInterrupt:
+        logger.info("Watcher stopped by user.")
+        print("Watcher stopped.")
         return
-
-    from apscheduler.schedulers.blocking import BlockingScheduler
-
-    scheduler = BlockingScheduler()
-    for adapter in adapters:
-        scheduler.add_job(
-            engine.check_site,
-            "interval",
-            seconds=adapter.config.interval_seconds,
-            args=[adapter],
-            id=adapter.config.name,
-            replace_existing=True,
-        )
-
-    scheduler.start()
 
 
 if __name__ == "__main__":

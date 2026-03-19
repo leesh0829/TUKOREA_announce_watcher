@@ -6,3 +6,4 @@ watcher.db
 watcher_config.json
 watcher_config.example.json
 watcher_config.example.backup.json
+logs/announce_watcher.pid

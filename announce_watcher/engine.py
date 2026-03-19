@@ -21,6 +21,8 @@ class WatcherEngine:
             self.logger.exception("Site check failed for %s", adapter.config.name)
             self.store.record_check(adapter.config.name, "error", str(exc))
             raise
+        finally:
+            adapter.close()
 
         existing_site_history = self.store.has_any_notices(adapter.config.name)
         should_notify = existing_site_history or adapter.config.notify_on_first_run

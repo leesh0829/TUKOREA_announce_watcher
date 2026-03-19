@@ -77,6 +77,45 @@ announce-watcher --once
 announce-watcher
 ```
 
+## 쉬운 시작/종료
+
+터미널을 계속 열어두지 않고 실행하려면 루트 폴더에서 아래 스크립트를 사용하면 됩니다.
+
+### 시작
+
+PowerShell:
+
+```powershell
+.\start-watcher.ps1
+```
+
+CMD 또는 더블클릭:
+
+```bat
+start-watcher.cmd
+```
+
+### 상태 확인
+
+```powershell
+.\status-watcher.ps1
+```
+
+### 종료
+
+```powershell
+.\stop-watcher.ps1
+```
+
+이 스크립트들은:
+
+- 백그라운드에서 감시기를 실행합니다.
+- `logs/announce_watcher.pid`에 PID를 저장합니다.
+- 이미 실행 중이면 중복 실행하지 않습니다.
+- 종료 시 PID 파일을 읽어 해당 감시기 프로세스를 정리합니다.
+
+PowerShell 실행 정책 때문에 `.ps1` 실행이 막히면 `.cmd` 파일을 사용하면 됩니다.
+
 ## 로그인 흐름 반영 방식
 
 ### KDUAL (`kpu.kdual.net`)

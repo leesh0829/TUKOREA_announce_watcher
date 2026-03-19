@@ -21,9 +21,13 @@ class FakeAdapter(SiteAdapter):
     def __init__(self, config: SiteConfig, notices: list[Notice]) -> None:
         super().__init__(config)
         self._notices = notices
+        self.close_calls = 0
 
     def fetch_notices(self) -> list[Notice]:
         return self._notices
+
+    def close(self) -> None:
+        self.close_calls += 1
 
 
 def test_engine_initial_run_builds_baseline_without_notification(tmp_path: Path) -> None:
@@ -40,6 +44,7 @@ def test_engine_initial_run_builds_baseline_without_notification(tmp_path: Path)
     assert first_count == 0
     assert second_count == 0
     assert notifier.messages == []
+    assert adapter.close_calls == 2
 
 
 def test_engine_notifies_only_for_new_notices_after_baseline(tmp_path: Path) -> None:
@@ -68,3 +73,23 @@ def test_engine_can_notify_on_first_run_when_opted_in(tmp_path: Path) -> None:
 
     assert count == 1
     assert notifier.messages == ["n1"]
+
+
+def test_engine_closes_adapter_after_fetch_error(tmp_path: Path) -> None:
+    class FailingAdapter(FakeAdapter):
+        def fetch_notices(self) -> list[Notice]:
+            raise ValueError("boom")
+
+    store = SQLiteNoticeStore(tmp_path / "watcher.db")
+    notifier = MemoryNotifier()
+    engine = WatcherEngine(store=store, notifier=notifier)
+    adapter = FailingAdapter(SiteConfig(name="test-site", interval_seconds=60), [])
+
+    try:
+        engine.check_site(adapter)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError")
+
+    assert adapter.close_calls == 1

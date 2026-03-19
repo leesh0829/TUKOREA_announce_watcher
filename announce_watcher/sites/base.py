@@ -16,6 +16,9 @@ class SiteAdapter(ABC):
     def login(self) -> None:
         """Optional hook for adapters that need authentication."""
 
+    def close(self) -> None:
+        """Optional hook for adapters that need cleanup after a check."""
+
     @abstractmethod
     def fetch_notices(self) -> list[Notice]:
         """Return normalized notices for the configured site."""
