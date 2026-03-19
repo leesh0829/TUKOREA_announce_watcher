@@ -2,9 +2,13 @@
 
 한국공학대학교 공지 게시판을 주기적으로 확인하고, 처음 본 공지만 알리도록 설계한 Python 기반 감시기입니다.
 
-## 지금 바로 해야 하는 설정/실행 순서
+## 이번 변경 핵심
 
-### 1) 설치
+- `kpu.kdual.net`처럼 **로그인 페이지에서 아이디/비밀번호 입력 후 버튼 클릭**이 필요한 사이트를 위해 `playwright_login_board` 어댑터를 추가했습니다.
+- `eclass.tukorea.ac.kr`처럼 **홈 진입 → 안내 팝업 확인 → 우측 상단 로그인 버튼 클릭 → 로그인 폼 입력** 흐름이 필요한 사이트도 같은 Playwright 어댑터로 처리할 수 있게 설정 예시를 넣었습니다.
+- 기존의 단순 폼 POST용 `authenticated_tukorea_board`는 그대로 남겨 두되, KDUAL/eclass 예제는 브라우저 클릭 흐름 기준으로 바꿨습니다.
+
+## 설치
 
 ```bash
 git clone <repo-url>
@@ -12,59 +16,88 @@ cd TUKOREA_announce_watcher
 python -m venv .venv
 ```
 
-#### Windows PowerShell
+### Windows PowerShell
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e .[dev]
+python -m pip install playwright
+playwright install chromium
 ```
 
-#### Windows CMD
+### Windows CMD
 
 ```bat
 .venv\Scripts\activate.bat
 python -m pip install -e .[dev]
+python -m pip install playwright
+playwright install chromium
 ```
 
-### 2) 설정 파일 만들기
+> 로그인 필요한 사이트를 쓰려면 Playwright와 Chromium 설치가 필요합니다.
 
-```bash
+## 설정 및 실행
+
+### 1) 설정 파일 만들기
+
+```bat
 copy watcher_config.example.json watcher_config.json
 ```
 
-또는:
+### 2) 계정 입력
 
-```bash
-announce-watcher --write-example-config
-```
-
-### 3) 로그인 필요한 사이트 계정 입력
-
-`watcher_config.json`에서 로그인 필요한 사이트들은 아래 값을 본인 계정으로 바꿔야 합니다.
+`watcher_config.json`에서 로그인 필요한 사이트들의 아래 값을 바꿉니다.
 
 - `settings.username`
 - `settings.password`
 
-그리고 실제 사용할 사이트는 `enabled: true`로 바꾸면 됩니다.
+그리고 사용할 사이트는 `enabled: true`로 바꿉니다.
 
-### 4) 1회 테스트 실행
+### 3) 1회 테스트
 
 ```bash
 announce-watcher --list-sites
 announce-watcher --once
 ```
 
-### 5) 계속 감시 실행
+### 4) 상시 실행
 
 ```bash
 announce-watcher
 ```
 
-## 감시 대상 사이트 목록
+## 로그인 흐름 반영 방식
 
-현재 예제 설정 파일에는 요청하신 9개 감시 대상이 미리 들어 있습니다.
+### KDUAL (`kpu.kdual.net`)
 
-### 로그인 필요
+사용자 설명대로:
+
+1. 로그인 페이지 진입
+2. 아이디 입력
+3. 비밀번호 입력
+4. 로그인 버튼 클릭
+
+흐름으로 처리하도록 Playwright 설정을 넣었습니다.
+
+예제 설정은 `input[type="text"]`, `input[type="password"]`, 그리고 "로그인" 텍스트가 있는 버튼/submit을 사용하도록 되어 있습니다.
+
+### eclass (`eclass.tukorea.ac.kr`)
+
+사용자 설명대로:
+
+1. 메인 페이지 접속
+2. 접속 종료 팝업이 뜨면 확인
+3. 우측 상단 로그인 버튼 클릭 (`a[href="/ilos/main/member/login_form.acl"]`)
+4. 로그인 폼에서 아이디/비밀번호 입력
+5. 로그인 버튼 클릭
+
+흐름으로 맞췄습니다.
+
+Playwright 어댑터는 페이지의 JS dialog를 자동으로 accept 하도록 되어 있어서, 설명하신 "확인" 팝업 흐름을 반영할 수 있습니다.
+
+## 감시 대상 사이트
+
+### 브라우저 로그인 필요
 
 1. `https://kpu.kdual.net/BBS/Board/List/S71855C704064`
 2. `https://kpu.kdual.net/BBS/Board/List/S71954C705054`
@@ -79,76 +112,22 @@ announce-watcher
 8. `https://contract.tukorea.ac.kr/contract/2792/subview.do`
 9. `https://contract.tukorea.ac.kr/contract/3844/subview.do`
 
-## 기본 동작 방식
+## 설정 파일에서 확인할 항목
 
-- 로그인 불필요 사이트는 `tukorea_board` 어댑터로 바로 조회합니다.
-- 로그인 필요 사이트는 `authenticated_tukorea_board` 어댑터를 사용합니다.
-- 첫 실행은 기존 글을 기준선으로 저장만 하고 알림하지 않습니다.
-- 이후부터 새 글만 알림합니다.
-- Windows에서는 `windows_toast` notifier 설정 시 토스트 알림을 띄웁니다.
-
-## 설정 파일에서 꼭 확인할 부분
-
-### 로그인 필요한 사이트
-
-예:
-
-```json
-{
-  "name": "kdual-board-1",
-  "enabled": true,
-  "login_mode": "session",
-  "adapter_type": "authenticated_tukorea_board",
-  "settings": {
-    "login_url": "https://kpu.kdual.net/login",
-    "username": "your-id",
-    "password": "your-password",
-    "username_field": "username",
-    "password_field": "password",
-    "board_url": "https://kpu.kdual.net/BBS/Board/List/S71855C704064"
-  }
-}
-```
-
-로그인 폼 필드명이 실제와 다르면 `username_field`, `password_field`, `extra_login_fields`를 사이트에 맞게 바꿔야 합니다.
-
-### 로그인 불필요 사이트
-
-예:
-
-```json
-{
-  "name": "contract-board-2792",
-  "enabled": true,
-  "adapter_type": "tukorea_board",
-  "settings": {
-    "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do"
-  }
-}
-```
-
-## 실행 명령 요약
-
-- 예제 설정 생성: `announce-watcher --write-example-config`
-- 사이트 목록 확인: `announce-watcher --list-sites`
-- 한 번만 체크: `announce-watcher --once`
-- 계속 감시: `announce-watcher`
-- 시작프로그램 등록: `announce-watcher --install-startup`
-- 시작프로그램 제거: `announce-watcher --uninstall-startup`
-- 트레이 모드: `announce-watcher --tray`
+- `adapter_type`
+  - `tukorea_board`: 로그인 없는 게시판
+  - `authenticated_tukorea_board`: 단순 폼 POST 로그인
+  - `playwright_login_board`: 브라우저 클릭 로그인 흐름
+- `login_button_selector`: eclass처럼 로그인 버튼을 먼저 눌러야 할 때 사용
+- `username_selector`, `password_selector`, `submit_selector`: 실제 로그인 폼 셀렉터
+- `headless`: 브라우저를 숨길지 여부
 
 ## 주의사항
 
-1. 로그인 사이트는 현재 **일반적인 폼 로그인**을 가정한 어댑터입니다.
-2. 실제 KDUAL / eclass 로그인 폼 구조가 다르면 필드명 또는 추가 hidden 값이 필요할 수 있습니다.
-3. eclass 공지 URL이 여러 개 동일하게 보이는 경우, 실제로는 과목 컨텍스트가 세션 상태로 갈릴 수 있어서 사이트별 추가 파라미터 튜닝이 필요할 수 있습니다.
-4. 비밀번호는 현재 설정 파일 평문 저장 방식이므로, 이후에는 OS 자격 증명 저장소 연동이 권장됩니다.
-
-## 로그 / 알림 / 시작프로그램
-
-- 로그 파일: `logs/announce_watcher.log`
-- Windows 토스트: `notifier.type = windows_toast`
-- 시작프로그램 등록: Windows Startup 폴더에 `.cmd` 생성
+1. KDUAL/eclass는 브라우저 흐름이 있는 사이트라서 현재는 Playwright 방식이 더 적합합니다.
+2. 사이트 HTML이 바뀌면 셀렉터(`username_selector`, `password_selector`, `submit_selector`)를 수정해야 할 수 있습니다.
+3. eclass의 동일 URL 공지들은 실제로는 과목 컨텍스트가 세션 상태에 묶여 있을 수 있어서, 과목별 파라미터가 더 필요할 수 있습니다.
+4. Playwright 트러블슈팅이 필요하면 우선 `headless: false`로 바꿔서 눈으로 로그인 과정을 확인하는 게 좋습니다.
 
 ## 테스트
 
