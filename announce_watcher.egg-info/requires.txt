@@ -1,0 +1,4 @@
+APScheduler<4,>=3.10
+
+[dev]
+pytest>=8.0

@@ -1,0 +1,2 @@
+[console_scripts]
+announce-watcher = announce_watcher.app:main
