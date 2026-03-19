@@ -1,0 +1,17 @@
+{
+  "db_path": "watcher.db",
+  "sites": [
+    {
+      "name": "tukorea-contract-notices",
+      "interval_seconds": 300,
+      "enabled": true,
+      "login_mode": "none",
+      "notify_on_first_run": false,
+      "adapter_type": "tukorea_board",
+      "settings": {
+        "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do",
+        "timeout_seconds": 20
+      }
+    }
+  ]
+}

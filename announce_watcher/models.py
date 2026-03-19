@@ -22,4 +22,11 @@ class SiteConfig:
     enabled: bool = True
     login_mode: str = "none"
     notify_on_first_run: bool = False
+    adapter_type: str = "tukorea_board"
     settings: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True, frozen=True)
+class AppConfig:
+    db_path: str = "watcher.db"
+    sites: tuple[SiteConfig, ...] = ()
