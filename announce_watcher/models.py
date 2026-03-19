@@ -27,6 +27,29 @@ class SiteConfig:
 
 
 @dataclass(slots=True, frozen=True)
+class LoggingConfig:
+    path: str = "logs/announce_watcher.log"
+    level: str = "INFO"
+    max_bytes: int = 1_048_576
+    backup_count: int = 3
+
+
+@dataclass(slots=True, frozen=True)
+class NotifierConfig:
+    type: str = "console"
+    enabled: bool = True
+
+
+@dataclass(slots=True, frozen=True)
+class StartupConfig:
+    enabled: bool = False
+    use_pythonw: bool = True
+
+
+@dataclass(slots=True, frozen=True)
 class AppConfig:
     db_path: str = "watcher.db"
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
+    notifier: NotifierConfig = field(default_factory=NotifierConfig)
+    startup: StartupConfig = field(default_factory=StartupConfig)
     sites: tuple[SiteConfig, ...] = ()

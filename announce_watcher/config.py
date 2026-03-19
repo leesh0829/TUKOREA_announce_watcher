@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from announce_watcher.models import AppConfig, SiteConfig
+from announce_watcher.models import AppConfig, LoggingConfig, NotifierConfig, SiteConfig, StartupConfig
+from announce_watcher.sites.authenticated_tukorea_board import AuthenticatedTukoreaBoardAdapter
 from announce_watcher.sites.base import SiteAdapter
 from announce_watcher.sites.tukorea_board import TukoreaBoardAdapter
 
@@ -13,6 +14,9 @@ DEFAULT_CONFIG_PATH = Path("watcher_config.json")
 def default_app_config() -> AppConfig:
     return AppConfig(
         db_path="watcher.db",
+        logging=LoggingConfig(),
+        notifier=NotifierConfig(type="console", enabled=True),
+        startup=StartupConfig(enabled=False, use_pythonw=True),
         sites=(
             SiteConfig(
                 name="tukorea-contract-notices",
@@ -24,6 +28,8 @@ def default_app_config() -> AppConfig:
                 settings={
                     "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do",
                     "timeout_seconds": 20,
+                    "retries": 2,
+                    "retry_backoff_seconds": 2,
                 },
             ),
         ),
@@ -33,6 +39,20 @@ def default_app_config() -> AppConfig:
 def app_config_to_dict(config: AppConfig) -> dict:
     return {
         "db_path": config.db_path,
+        "logging": {
+            "path": config.logging.path,
+            "level": config.logging.level,
+            "max_bytes": config.logging.max_bytes,
+            "backup_count": config.logging.backup_count,
+        },
+        "notifier": {
+            "type": config.notifier.type,
+            "enabled": config.notifier.enabled,
+        },
+        "startup": {
+            "enabled": config.startup.enabled,
+            "use_pythonw": config.startup.use_pythonw,
+        },
         "sites": [
             {
                 "name": site.name,
@@ -73,7 +93,27 @@ def load_app_config(path: str | Path | None = None) -> AppConfig:
         )
         for site in raw.get("sites", [])
     )
-    return AppConfig(db_path=str(raw.get("db_path", "watcher.db")), sites=sites)
+    logging_config = raw.get("logging", {})
+    notifier_config = raw.get("notifier", {})
+    startup_config = raw.get("startup", {})
+    return AppConfig(
+        db_path=str(raw.get("db_path", "watcher.db")),
+        logging=LoggingConfig(
+            path=str(logging_config.get("path", "logs/announce_watcher.log")),
+            level=str(logging_config.get("level", "INFO")),
+            max_bytes=int(logging_config.get("max_bytes", 1_048_576)),
+            backup_count=int(logging_config.get("backup_count", 3)),
+        ),
+        notifier=NotifierConfig(
+            type=str(notifier_config.get("type", "console")),
+            enabled=bool(notifier_config.get("enabled", True)),
+        ),
+        startup=StartupConfig(
+            enabled=bool(startup_config.get("enabled", False)),
+            use_pythonw=bool(startup_config.get("use_pythonw", True)),
+        ),
+        sites=sites,
+    )
 
 
 def build_site_adapters(app_config: AppConfig) -> list[SiteAdapter]:
@@ -88,4 +128,6 @@ def build_site_adapters(app_config: AppConfig) -> list[SiteAdapter]:
 def build_adapter(site_config: SiteConfig) -> SiteAdapter:
     if site_config.adapter_type == "tukorea_board":
         return TukoreaBoardAdapter(site_config)
+    if site_config.adapter_type == "authenticated_tukorea_board":
+        return AuthenticatedTukoreaBoardAdapter(site_config)
     raise ValueError(f"Unsupported adapter_type: {site_config.adapter_type}")

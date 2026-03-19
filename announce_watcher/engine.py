@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from announce_watcher.notifier import Notifier
 from announce_watcher.sites.base import SiteAdapter
 from announce_watcher.storage import SQLiteNoticeStore
@@ -9,12 +11,14 @@ class WatcherEngine:
     def __init__(self, store: SQLiteNoticeStore, notifier: Notifier) -> None:
         self.store = store
         self.notifier = notifier
+        self.logger = logging.getLogger("announce_watcher")
 
     def check_site(self, adapter: SiteAdapter) -> int:
         try:
             adapter.login()
-            notices = adapter.fetch_notices()
+            notices = adapter.fetch_notices_with_retry()
         except Exception as exc:  # pragma: no cover - defensive logging path
+            self.logger.exception("Site check failed for %s", adapter.config.name)
             self.store.record_check(adapter.config.name, "error", str(exc))
             raise
 

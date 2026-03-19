@@ -21,6 +21,9 @@ def test_load_app_config_reads_json_file(tmp_path: Path) -> None:
         json.dumps(
             {
                 "db_path": "custom.db",
+                "notifier": {"type": "windows_toast", "enabled": True},
+                "logging": {"path": "logs/custom.log", "level": "DEBUG", "max_bytes": 2048, "backup_count": 5},
+                "startup": {"enabled": True, "use_pythonw": False},
                 "sites": [
                     {
                         "name": "board-a",
@@ -40,6 +43,9 @@ def test_load_app_config_reads_json_file(tmp_path: Path) -> None:
 
     assert config.db_path == "custom.db"
     assert len(config.sites) == 1
+    assert config.notifier.type == "windows_toast"
+    assert config.logging.level == "DEBUG"
+    assert config.startup.enabled is True
     assert config.sites[0].notify_on_first_run is True
     assert config.sites[0].settings["board_url"] == "https://example.com/board"
 

@@ -4,215 +4,205 @@
 
 ## 현재 구현된 단계
 
-- TUKOREA K2Web 게시판용 HTTP 어댑터가 기본 포함되어 있습니다.
-- 여러 게시판을 **JSON 설정 파일**로 관리할 수 있습니다.
-- 이미 본 공지는 SQLite DB에 저장해서 중복 알림을 막습니다.
-- 첫 실행은 기존 게시물을 기준선으로만 저장하고 알리지 않습니다.
-- `--once`, `--list-sites`, `--write-example-config` 같은 실행 옵션을 지원합니다.
+- TUKOREA K2Web 게시판용 HTTP 어댑터 포함
+- 로그인 필요한 사이트용 **세션 로그인 어댑터 뼈대** 포함
+- 여러 게시판을 **JSON 설정 파일**로 관리 가능
+- SQLite 중복 방지 저장소 포함
+- **Windows 토스트 알림** 지원
+- **로그 파일 로테이션** 및 요청 **재시도 정책** 지원
+- **시작프로그램 등록/해제** 지원
+- **트레이 모드 엔트리포인트** 포함(옵션 패키지 필요)
 
 ## 요구 사항
 
 - Python 3.11 이상
 - 인터넷 연결
+- Windows 토스트/시작프로그램은 Windows 환경
 - `venv` 사용 가능 환경
 
-## 처음 세팅하는 방법
-
-### 1) 저장소 받기
+## 설치
 
 ```bash
 git clone <repo-url>
 cd TUKOREA_announce_watcher
+python -m venv .venv
 ```
 
-### 2) 가상환경 만들기
-
-#### macOS / Linux
+### macOS / Linux
 
 ```bash
-python3 -m venv .venv
 source .venv/bin/activate
-```
-
-#### Windows PowerShell
-
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-#### Windows CMD
-
-```bat
-py -3 -m venv .venv
-.venv\Scripts\activate.bat
-```
-
-### 3) 패키지 설치
-
-개발용 테스트 의존성까지 같이 설치하려면:
-
-```bash
 python -m pip install -e .[dev]
 ```
 
-실행만 하려면:
+### Windows PowerShell
 
-```bash
-python -m pip install -e .
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e .[dev]
 ```
 
-## 설정 파일 준비
+### Windows CMD
 
-예제 설정 파일을 만들려면:
+```bat
+.venv\Scripts\activate.bat
+python -m pip install -e .[dev]
+```
+
+## 설정 파일 만들기
 
 ```bash
 announce-watcher --write-example-config
 ```
 
-또는 저장소에 들어 있는 `watcher_config.example.json`을 복사해서 `watcher_config.json`으로 써도 됩니다.
+또는 `watcher_config.example.json`을 복사해서 `watcher_config.json`으로 사용하면 됩니다.
+
+## 주요 기능
+
+### 1) Windows 토스트 알림
+
+설정 파일에서 아래처럼 켜면 됩니다.
+
+```json
+"notifier": {
+  "type": "windows_toast",
+  "enabled": true
+}
+```
+
+현재 구현은 콘솔 출력 + Windows PowerShell 기반 토스트를 함께 사용합니다. Windows가 아닌 환경에서는 토스트는 건너뛰고 로그만 남깁니다.
+
+### 2) 로그 파일 / 로테이션
+
+```json
+"logging": {
+  "path": "logs/announce_watcher.log",
+  "level": "INFO",
+  "max_bytes": 1048576,
+  "backup_count": 3
+}
+```
+
+- 로그 파일은 자동 생성됩니다.
+- 크기가 커지면 회전(rotating)됩니다.
+- 콘솔에도 같이 출력됩니다.
+
+### 3) 재시도 정책
+
+사이트별 `settings`에 아래 값을 둘 수 있습니다.
+
+```json
+"settings": {
+  "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do",
+  "timeout_seconds": 20,
+  "retries": 2,
+  "retry_backoff_seconds": 2
+}
+```
+
+실패 시 점진적으로 대기 후 재시도합니다.
+
+### 4) 로그인 필요한 사이트 어댑터
+
+`authenticated_tukorea_board` 어댑터를 추가했습니다.
+
+예:
+
+```json
+{
+  "name": "secure-example-board",
+  "enabled": true,
+  "login_mode": "session",
+  "adapter_type": "authenticated_tukorea_board",
+  "interval_seconds": 300,
+  "settings": {
+    "login_url": "https://example.com/login",
+    "username": "your-id",
+    "password": "your-password",
+    "username_field": "username",
+    "password_field": "password",
+    "extra_login_fields": {},
+    "board_url": "https://example.com/protected-board"
+  }
+}
+```
+
+이 어댑터는 폼 로그인 후 쿠키 세션을 유지하면서 보호된 게시판을 읽는 구조입니다.
+
+### 5) 시작프로그램 연동
+
+설치:
 
 ```bash
-cp watcher_config.example.json watcher_config.json
+announce-watcher --install-startup
 ```
 
-Windows CMD에서는:
+제거:
 
-```bat
-copy watcher_config.example.json watcher_config.json
+```bash
+announce-watcher --uninstall-startup
 ```
 
-## 실행 방법
+Windows Startup 폴더에 `.cmd` 런처를 생성/삭제합니다.
 
-### 1회만 체크하고 종료
+### 6) 트레이 앱 모드
+
+```bash
+announce-watcher --tray
+```
+
+트레이 모드는 선택 기능이며 `pystray`, `Pillow` 설치가 필요합니다.
+현재는 최소 트레이 엔트리포인트까지 구현되어 있습니다.
+
+## 실행 예시
+
+### 1회 체크
 
 ```bash
 announce-watcher --once
 ```
 
-또는:
-
-```bash
-python -m announce_watcher.app --once
-```
-
-### 등록된 사이트 목록만 보기
+### 활성 사이트 목록 확인
 
 ```bash
 announce-watcher --list-sites
 ```
 
-### 백그라운드처럼 계속 감시하기
+### 계속 감시
 
 ```bash
 announce-watcher
 ```
 
-실행되면 시작 시 한 번 체크한 뒤, 각 사이트의 `interval_seconds` 주기로 계속 확인합니다.
+## 첫 실행 알림 정책
 
-## 첫 실행 알림 동작
+기본값에서는 **첫 실행은 기존 글을 기준선으로만 저장하고 알리지 않습니다.**
+그 다음부터 새로 올라온 공지만 알림합니다.
 
-기본값에서는 **첫 실행 때 기존 글이 있더라도 알림을 보내지 않습니다.**
-첫 실행은 현재 목록을 DB에 저장해서 "여기까지는 이미 본 것"으로 기준선만 잡습니다.
+## 설정 파일 예시
 
-즉:
+전체 예시는 `watcher_config.example.json`에 들어 있습니다.
 
-1. 첫 실행 → 기존 글 저장만 하고 알림 없음
-2. 이후 실행 → 그 뒤에 새로 생긴 글만 알림
+핵심 필드:
 
-원하면 사이트별로 `notify_on_first_run=true`를 설정 파일에 넣어 첫 실행 알림을 켤 수 있습니다.
-
-## 설정 파일 형식
-
-`watcher_config.json` 예시는 아래처럼 생겼습니다.
-
-```json
-{
-  "db_path": "watcher.db",
-  "sites": [
-    {
-      "name": "tukorea-contract-notices",
-      "interval_seconds": 300,
-      "enabled": true,
-      "login_mode": "none",
-      "notify_on_first_run": false,
-      "adapter_type": "tukorea_board",
-      "settings": {
-        "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do",
-        "timeout_seconds": 20
-      }
-    }
-  ]
-}
-```
-
-설정 항목:
-
-- `db_path`: SQLite DB 경로
+- `db_path`: SQLite 경로
+- `logging`: 로그 파일 설정
+- `notifier`: 알림 방식
+- `startup`: 시작프로그램 관련 기본값
 - `sites`: 감시 대상 목록
-- `name`: 사이트 식별자
-- `interval_seconds`: 체크 주기(초)
-- `enabled`: 활성화 여부
-- `notify_on_first_run`: 첫 실행 알림 여부
-- `adapter_type`: 현재는 `tukorea_board` 지원
-- `settings.board_url`: 감시할 게시판 목록 URL
-- `settings.timeout_seconds`: HTTP 타임아웃
+- `sites[].adapter_type`: `tukorea_board` 또는 `authenticated_tukorea_board`
 
-## 여러 게시판 추가 예시
-
-```json
-{
-  "db_path": "watcher.db",
-  "sites": [
-    {
-      "name": "contract-notices",
-      "interval_seconds": 300,
-      "enabled": true,
-      "adapter_type": "tukorea_board",
-      "settings": {
-        "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do"
-      }
-    },
-    {
-      "name": "another-board",
-      "interval_seconds": 600,
-      "enabled": true,
-      "adapter_type": "tukorea_board",
-      "settings": {
-        "board_url": "https://example.tukorea.ac.kr/example/1234/subview.do"
-      }
-    }
-  ]
-}
-```
-
-## CLI 옵션
-
-- `--config <path>`: 설정 파일 경로 지정
-- `--db-path <path>`: SQLite DB 경로 강제 override
-- `--once`: 한 번만 실행 후 종료
-- `--list-sites`: 활성 사이트 목록 출력 후 종료
-- `--write-example-config`: 예제 설정 파일 생성 후 종료
-
-## 테스트 방법
+## 테스트
 
 ```bash
 python -m pytest -q
 ```
 
-## 파일 구조
+## 현재 상태에서 남아 있는 현실적인 후속 작업
 
-- `announce_watcher/app.py`: CLI 및 스케줄러 시작점
-- `announce_watcher/config.py`: 설정 로드/예제 설정 생성/어댑터 빌드
-- `announce_watcher/engine.py`: 공지 비교, 저장, 알림 호출
-- `announce_watcher/storage.py`: SQLite 저장소
-- `announce_watcher/notifier.py`: 알림 인터페이스 및 콘솔 구현
-- `announce_watcher/sites/tukorea_board.py`: TUKOREA 게시판 파서/HTTP 어댑터
-- `watcher_config.example.json`: 시작용 예제 설정 파일
+이번 변경으로 요청하신 4가지는 모두 코드 경로에 반영했습니다. 다만 실사용 완성도를 더 끌어올리려면 이후에는 아래를 추가하면 좋습니다.
 
-## 다음 개발 후보
-
-1. Windows 토스트 알림 붙이기
-2. 설정 UI 또는 트레이 앱 추가
-3. 로그인 필요한 사이트용 별도 어댑터 추가
-4. 에러 로그 파일 저장 및 재시도 정책 추가
+1. 토스트 클릭 시 브라우저 열기 액션
+2. 트레이 메뉴(일시정지/즉시 확인/종료)
+3. 로그인 어댑터별 사이트 맞춤 파서
+4. 암호 평문 저장 대신 OS 자격 증명 저장소 연동
