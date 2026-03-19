@@ -11,8 +11,9 @@ def test_load_app_config_returns_defaults_when_file_missing(tmp_path: Path) -> N
     config = load_app_config(tmp_path / "missing.json")
 
     assert config.db_path == "watcher.db"
-    assert len(config.sites) == 1
-    assert config.sites[0].name == "tukorea-contract-notices"
+    assert len(config.sites) == 9
+    assert config.sites[0].name == "kdual-board-1"
+    assert config.sites[2].name == "contract-board-2792"
 
 
 def test_load_app_config_reads_json_file(tmp_path: Path) -> None:

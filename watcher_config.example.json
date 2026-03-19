@@ -16,7 +16,49 @@
   },
   "sites": [
     {
-      "name": "tukorea-contract-notices",
+      "name": "kdual-board-1",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://kpu.kdual.net/login",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "username",
+        "password_field": "password",
+        "extra_login_fields": {},
+        "board_url": "https://kpu.kdual.net/BBS/Board/List/S71855C704064",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "kdual-board-2",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://kpu.kdual.net/login",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "username",
+        "password_field": "password",
+        "extra_login_fields": {},
+        "board_url": "https://kpu.kdual.net/BBS/Board/List/S71954C705054",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "contract-board-2792",
       "interval_seconds": 300,
       "enabled": true,
       "login_mode": "none",
@@ -30,20 +72,118 @@
       }
     },
     {
-      "name": "secure-example-board",
+      "name": "contract-board-3844",
+      "interval_seconds": 300,
+      "enabled": true,
+      "login_mode": "none",
+      "notify_on_first_run": false,
+      "adapter_type": "tukorea_board",
+      "settings": {
+        "board_url": "https://contract.tukorea.ac.kr/contract/3844/subview.do",
+        "timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "eclass-course-1",
       "interval_seconds": 300,
       "enabled": false,
       "login_mode": "session",
       "notify_on_first_run": false,
       "adapter_type": "authenticated_tukorea_board",
       "settings": {
-        "login_url": "https://example.com/login",
+        "login_url": "https://eclass.tukorea.ac.kr/ilos/main/member/login_form.acl",
         "username": "your-id",
         "password": "your-password",
-        "username_field": "username",
-        "password_field": "password",
+        "username_field": "usr_id",
+        "password_field": "usr_pwd",
         "extra_login_fields": {},
-        "board_url": "https://example.com/protected-board",
+        "board_url": "https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "eclass-zoom-1",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://eclass.tukorea.ac.kr/ilos/main/member/login_form.acl",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "usr_id",
+        "password_field": "usr_pwd",
+        "extra_login_fields": {},
+        "board_url": "https://eclass.tukorea.ac.kr/ilos/st/course/zoom_list_form.acl",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "eclass-course-2",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://eclass.tukorea.ac.kr/ilos/main/member/login_form.acl",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "usr_id",
+        "password_field": "usr_pwd",
+        "extra_login_fields": {},
+        "board_url": "https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "eclass-course-3",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://eclass.tukorea.ac.kr/ilos/main/member/login_form.acl",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "usr_id",
+        "password_field": "usr_pwd",
+        "extra_login_fields": {},
+        "board_url": "https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl",
+        "timeout_seconds": 20,
+        "login_timeout_seconds": 20,
+        "retries": 2,
+        "retry_backoff_seconds": 2
+      }
+    },
+    {
+      "name": "eclass-course-4",
+      "interval_seconds": 300,
+      "enabled": false,
+      "login_mode": "session",
+      "notify_on_first_run": false,
+      "adapter_type": "authenticated_tukorea_board",
+      "settings": {
+        "login_url": "https://eclass.tukorea.ac.kr/ilos/main/member/login_form.acl",
+        "username": "your-id",
+        "password": "your-password",
+        "username_field": "usr_id",
+        "password_field": "usr_pwd",
+        "extra_login_fields": {},
+        "board_url": "https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl",
         "timeout_seconds": 20,
         "login_timeout_seconds": 20,
         "retries": 2,
