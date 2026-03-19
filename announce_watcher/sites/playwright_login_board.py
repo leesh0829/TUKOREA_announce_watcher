@@ -64,12 +64,33 @@ class PlaywrightLoginBoardAdapter(TukoreaBoardAdapter):
         page.locator(password_selector).first.fill(str(password))
         page.locator(submit_selector).first.click()
         page.wait_for_load_state("networkidle")
+        self._select_course_context_if_needed(page)
 
     def fetch_notices(self) -> list:
         page = self._ensure_page()
+        self._select_course_context_if_needed(page)
         board_url = self.config.settings["board_url"]
         page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
         return self.parse_notice_list(page.content(), board_url)
+
+    def _select_course_context_if_needed(self, page) -> None:
+        course_name = self.config.settings.get("course_name")
+        if not course_name:
+            return
+
+        current_course_selector = self.config.settings.get("current_course_selector", "#subject-span")
+        current_course_locator = page.locator(current_course_selector)
+        if current_course_locator.count() and current_course_locator.first.inner_text().strip() == str(course_name):
+            return
+
+        subject_change_selector = self.config.settings.get("subject_change_selector", "#eclass_subject_change")
+        subject_popup_selector = self.config.settings.get("subject_popup_selector", "#subject_room")
+        course_item_selector = self.config.settings.get("course_item_selector", ".roomGo")
+
+        page.locator(subject_change_selector).first.click()
+        page.locator(subject_popup_selector).first.wait_for(state="visible")
+        page.locator(f"{subject_popup_selector} {course_item_selector}").filter(has_text=str(course_name)).first.click()
+        page.wait_for_load_state("networkidle")
 
     def close(self) -> None:
         if self._context is not None:
