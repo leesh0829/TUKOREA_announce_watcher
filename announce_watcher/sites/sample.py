@@ -11,12 +11,14 @@ class SampleStaticSiteAdapter(SiteAdapter):
 
     def fetch_notices(self) -> list[Notice]:
         base_url = self.config.settings.get("base_url", "https://example.com/notices")
+        notice_path = self.config.settings.get("notice_path")
+        notice_url = f"{base_url.rstrip('/')}/{notice_path.lstrip('/')}" if notice_path else base_url
         return [
             Notice(
                 site_name=self.config.name,
-                notice_key="welcome-notice",
-                title="Sample notice",
-                url=f"{base_url}/welcome-notice",
+                notice_key=self.config.settings.get("notice_key", "sample-notice"),
+                title=self.config.settings.get("title", "Sample notice"),
+                url=notice_url,
                 published_at=datetime(2026, 3, 18, tzinfo=timezone.utc),
             )
         ]

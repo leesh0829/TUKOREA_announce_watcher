@@ -51,6 +51,14 @@ class SQLiteNoticeStore:
             ).fetchone()
         return row is not None
 
+    def has_any_notices(self, site_name: str) -> bool:
+        with closing(self._connect()) as conn:
+            row = conn.execute(
+                "SELECT 1 FROM notices WHERE site_name = ? LIMIT 1",
+                (site_name,),
+            ).fetchone()
+        return row is not None
+
     def save_notice(self, notice: Notice) -> None:
         with closing(self._connect()) as conn:
             conn.execute(

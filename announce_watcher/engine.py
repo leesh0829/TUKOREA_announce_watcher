@@ -18,14 +18,21 @@ class WatcherEngine:
             self.store.record_check(adapter.config.name, "error", str(exc))
             raise
 
+        existing_site_history = self.store.has_any_notices(adapter.config.name)
+        should_notify = existing_site_history or adapter.config.notify_on_first_run
         new_count = 0
+
         for notice in notices:
             notice_key = adapter.normalize_notice_key(notice)
             if self.store.has_notice(adapter.config.name, notice_key):
                 continue
             self.store.save_notice(notice)
-            self.notifier.notify_new_notice(notice)
-            new_count += 1
+            if should_notify:
+                self.notifier.notify_new_notice(notice)
+                new_count += 1
 
-        self.store.record_check(adapter.config.name, "ok", f"new={new_count}")
+        detail = f"new={new_count}"
+        if not existing_site_history and not adapter.config.notify_on_first_run:
+            detail = "baseline-initialized"
+        self.store.record_check(adapter.config.name, "ok", detail)
         return new_count

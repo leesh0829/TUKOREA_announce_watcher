@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from typing import Any
 
 
 @dataclass(slots=True, frozen=True)
@@ -20,4 +21,5 @@ class SiteConfig:
     interval_seconds: int
     enabled: bool = True
     login_mode: str = "none"
-    settings: dict[str, str] = field(default_factory=dict)
+    notify_on_first_run: bool = False
+    settings: dict[str, Any] = field(default_factory=dict)

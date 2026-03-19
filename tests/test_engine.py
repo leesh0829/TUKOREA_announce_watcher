@@ -26,7 +26,7 @@ class FakeAdapter(SiteAdapter):
         return self._notices
 
 
-def test_engine_only_notifies_for_new_notices(tmp_path: Path) -> None:
+def test_engine_initial_run_builds_baseline_without_notification(tmp_path: Path) -> None:
     store = SQLiteNoticeStore(tmp_path / "watcher.db")
     notifier = MemoryNotifier()
     engine = WatcherEngine(store=store, notifier=notifier)
@@ -37,6 +37,34 @@ def test_engine_only_notifies_for_new_notices(tmp_path: Path) -> None:
     first_count = engine.check_site(adapter)
     second_count = engine.check_site(adapter)
 
-    assert first_count == 1
+    assert first_count == 0
     assert second_count == 0
+    assert notifier.messages == []
+
+
+def test_engine_notifies_only_for_new_notices_after_baseline(tmp_path: Path) -> None:
+    store = SQLiteNoticeStore(tmp_path / "watcher.db")
+    notifier = MemoryNotifier()
+    engine = WatcherEngine(store=store, notifier=notifier)
+    config = SiteConfig(name="test-site", interval_seconds=60)
+    baseline_notice = Notice(site_name="test-site", notice_key="n1", title="Hello", url="https://example.com/1")
+    new_notice = Notice(site_name="test-site", notice_key="n2", title="World", url="https://example.com/2")
+
+    engine.check_site(FakeAdapter(config, [baseline_notice]))
+    count = engine.check_site(FakeAdapter(config, [baseline_notice, new_notice]))
+
+    assert count == 1
+    assert notifier.messages == ["n2"]
+
+
+def test_engine_can_notify_on_first_run_when_opted_in(tmp_path: Path) -> None:
+    store = SQLiteNoticeStore(tmp_path / "watcher.db")
+    notifier = MemoryNotifier()
+    engine = WatcherEngine(store=store, notifier=notifier)
+    config = SiteConfig(name="test-site", interval_seconds=60, notify_on_first_run=True)
+    notice = Notice(site_name="test-site", notice_key="n1", title="Hello", url="https://example.com")
+
+    count = engine.check_site(FakeAdapter(config, [notice]))
+
+    assert count == 1
     assert notifier.messages == ["n1"]
