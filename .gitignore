@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+watcher.db
+watcher_config.json
+watcher_config.example.json

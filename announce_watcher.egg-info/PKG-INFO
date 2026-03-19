@@ -1,0 +1,167 @@
+Metadata-Version: 2.4
+Name: announce-watcher
+Version: 0.1.0
+Summary: Background notice watcher skeleton with pluggable site adapters
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: APScheduler<4,>=3.10
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+
+# TUKOREA announce watcher
+
+한국공학대학교 공지 게시판을 주기적으로 확인하고, 처음 본 공지만 알리도록 설계한 Python 기반 감시기입니다.
+
+## 지금 바로 해야 하는 설정/실행 순서
+
+### 1) 설치
+
+```bash
+git clone <repo-url>
+cd TUKOREA_announce_watcher
+python -m venv .venv
+```
+
+#### Windows PowerShell
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e .[dev]
+```
+
+#### Windows CMD
+
+```bat
+.venv\Scripts\activate.bat
+python -m pip install -e .[dev]
+```
+
+### 2) 설정 파일 만들기
+
+```bash
+copy watcher_config.example.json watcher_config.json
+```
+
+또는:
+
+```bash
+announce-watcher --write-example-config
+```
+
+### 3) 로그인 필요한 사이트 계정 입력
+
+`watcher_config.json`에서 로그인 필요한 사이트들은 아래 값을 본인 계정으로 바꿔야 합니다.
+
+- `settings.username`
+- `settings.password`
+
+그리고 실제 사용할 사이트는 `enabled: true`로 바꾸면 됩니다.
+
+### 4) 1회 테스트 실행
+
+```bash
+announce-watcher --list-sites
+announce-watcher --once
+```
+
+### 5) 계속 감시 실행
+
+```bash
+announce-watcher
+```
+
+## 감시 대상 사이트 목록
+
+현재 예제 설정 파일에는 요청하신 9개 감시 대상이 미리 들어 있습니다.
+
+### 로그인 필요
+
+1. `https://kpu.kdual.net/BBS/Board/List/S71855C704064`
+2. `https://kpu.kdual.net/BBS/Board/List/S71954C705054`
+3. `https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl`
+4. `https://eclass.tukorea.ac.kr/ilos/st/course/zoom_list_form.acl`
+5. `https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl`
+6. `https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl`
+7. `https://eclass.tukorea.ac.kr/ilos/st/course/notice_list_form.acl`
+
+### 로그인 불필요
+
+8. `https://contract.tukorea.ac.kr/contract/2792/subview.do`
+9. `https://contract.tukorea.ac.kr/contract/3844/subview.do`
+
+## 기본 동작 방식
+
+- 로그인 불필요 사이트는 `tukorea_board` 어댑터로 바로 조회합니다.
+- 로그인 필요 사이트는 `authenticated_tukorea_board` 어댑터를 사용합니다.
+- 첫 실행은 기존 글을 기준선으로 저장만 하고 알림하지 않습니다.
+- 이후부터 새 글만 알림합니다.
+- Windows에서는 `windows_toast` notifier 설정 시 토스트 알림을 띄웁니다.
+
+## 설정 파일에서 꼭 확인할 부분
+
+### 로그인 필요한 사이트
+
+예:
+
+```json
+{
+  "name": "kdual-board-1",
+  "enabled": true,
+  "login_mode": "session",
+  "adapter_type": "authenticated_tukorea_board",
+  "settings": {
+    "login_url": "https://kpu.kdual.net/login",
+    "username": "your-id",
+    "password": "your-password",
+    "username_field": "username",
+    "password_field": "password",
+    "board_url": "https://kpu.kdual.net/BBS/Board/List/S71855C704064"
+  }
+}
+```
+
+로그인 폼 필드명이 실제와 다르면 `username_field`, `password_field`, `extra_login_fields`를 사이트에 맞게 바꿔야 합니다.
+
+### 로그인 불필요 사이트
+
+예:
+
+```json
+{
+  "name": "contract-board-2792",
+  "enabled": true,
+  "adapter_type": "tukorea_board",
+  "settings": {
+    "board_url": "https://contract.tukorea.ac.kr/contract/2792/subview.do"
+  }
+}
+```
+
+## 실행 명령 요약
+
+- 예제 설정 생성: `announce-watcher --write-example-config`
+- 사이트 목록 확인: `announce-watcher --list-sites`
+- 한 번만 체크: `announce-watcher --once`
+- 계속 감시: `announce-watcher`
+- 시작프로그램 등록: `announce-watcher --install-startup`
+- 시작프로그램 제거: `announce-watcher --uninstall-startup`
+- 트레이 모드: `announce-watcher --tray`
+
+## 주의사항
+
+1. 로그인 사이트는 현재 **일반적인 폼 로그인**을 가정한 어댑터입니다.
+2. 실제 KDUAL / eclass 로그인 폼 구조가 다르면 필드명 또는 추가 hidden 값이 필요할 수 있습니다.
+3. eclass 공지 URL이 여러 개 동일하게 보이는 경우, 실제로는 과목 컨텍스트가 세션 상태로 갈릴 수 있어서 사이트별 추가 파라미터 튜닝이 필요할 수 있습니다.
+4. 비밀번호는 현재 설정 파일 평문 저장 방식이므로, 이후에는 OS 자격 증명 저장소 연동이 권장됩니다.
+
+## 로그 / 알림 / 시작프로그램
+
+- 로그 파일: `logs/announce_watcher.log`
+- Windows 토스트: `notifier.type = windows_toast`
+- 시작프로그램 등록: Windows Startup 폴더에 `.cmd` 생성
+
+## 테스트
+
+```bash
+python -m pytest -q
+```

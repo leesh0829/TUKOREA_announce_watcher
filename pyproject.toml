@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "announce-watcher"
+version = "0.1.0"
+description = "Background notice watcher skeleton with pluggable site adapters"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "APScheduler>=3.10,<4",
+]
+
+[project.scripts]
+announce-watcher = "announce_watcher.app:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
