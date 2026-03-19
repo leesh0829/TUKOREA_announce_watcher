@@ -846,3 +846,227 @@ Call log:
 2026-03-19 14:37:17,023 [INFO] Checked contract-board-2792: 0 new notices
 2026-03-19 14:37:17,475 [INFO] Checked contract-board-3844: 0 new notices
 2026-03-19 14:37:24,486 [INFO] Checked eclass-course-1: 0 new notices
+2026-03-19 14:53:02,775 [INFO] Checked kdual-board-1: 0 new notices
+2026-03-19 14:53:05,694 [INFO] Checked kdual-board-2: 0 new notices
+2026-03-19 14:53:06,292 [INFO] Checked contract-board-2792: 0 new notices
+2026-03-19 14:53:06,853 [INFO] Checked contract-board-3844: 0 new notices
+2026-03-19 14:53:13,931 [INFO] Checked eclass-course-1: 0 new notices
+2026-03-19 14:53:20,664 [INFO] Checked eclass-zoom-1: 0 new notices
+2026-03-19 14:53:27,773 [INFO] Checked eclass-course-2: 0 new notices
+2026-03-19 14:53:34,890 [INFO] Checked eclass-course-3: 0 new notices
+2026-03-19 14:53:41,577 [INFO] Checked eclass-course-4: 0 new notices
+2026-03-19 14:58:55,516 [ERROR] Site check failed for kdual-board-2
+Traceback (most recent call last):
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\engine.py", line 19, in check_site
+    notices = adapter.fetch_notices_with_retry()
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\base.py", line 35, in fetch_notices_with_retry
+    return self.fetch_notices()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\playwright_login_board.py", line 81, in fetch_notices
+    page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\sync_api\_generated.py", line 9054, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: Navigation to "https://kpu.kdual.net/BBS/Board/List/S71954C705054" is interrupted by another navigation to "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+Call log:
+  - navigating to "https://kpu.kdual.net/BBS/Board/List/S71954C705054", waiting until "networkidle"
+
+2026-03-19 15:13:45,725 [ERROR] Site check failed for kdual-board-2
+Traceback (most recent call last):
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\engine.py", line 19, in check_site
+    notices = adapter.fetch_notices_with_retry()
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\base.py", line 35, in fetch_notices_with_retry
+    return self.fetch_notices()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\playwright_login_board.py", line 81, in fetch_notices
+    page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\sync_api\_generated.py", line 9054, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: Navigation to "https://kpu.kdual.net/BBS/Board/List/S71954C705054" is interrupted by another navigation to "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+Call log:
+  - navigating to "https://kpu.kdual.net/BBS/Board/List/S71954C705054", waiting until "networkidle"
+
+2026-03-19 15:18:46,223 [ERROR] Site check failed for kdual-board-2
+Traceback (most recent call last):
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\engine.py", line 19, in check_site
+    notices = adapter.fetch_notices_with_retry()
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\base.py", line 35, in fetch_notices_with_retry
+    return self.fetch_notices()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\playwright_login_board.py", line 81, in fetch_notices
+    page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\sync_api\_generated.py", line 9054, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: Navigation to "https://kpu.kdual.net/BBS/Board/List/S71954C705054" is interrupted by another navigation to "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+Call log:
+  - navigating to "https://kpu.kdual.net/BBS/Board/List/S71954C705054", waiting until "networkidle"
+
+2026-03-19 15:23:45,774 [ERROR] Site check failed for kdual-board-2
+Traceback (most recent call last):
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\engine.py", line 19, in check_site
+    notices = adapter.fetch_notices_with_retry()
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\base.py", line 35, in fetch_notices_with_retry
+    return self.fetch_notices()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\playwright_login_board.py", line 81, in fetch_notices
+    page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\sync_api\_generated.py", line 9054, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: Navigation to "https://kpu.kdual.net/BBS/Board/List/S71954C705054" is interrupted by another navigation to "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+Call log:
+  - navigating to "https://kpu.kdual.net/BBS/Board/List/S71954C705054", waiting until "networkidle"
+
+2026-03-19 15:23:45,830 [ERROR] Site check failed for kdual-board-1
+Traceback (most recent call last):
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\engine.py", line 19, in check_site
+    notices = adapter.fetch_notices_with_retry()
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\base.py", line 35, in fetch_notices_with_retry
+    return self.fetch_notices()
+           ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\announce_watcher\sites\playwright_login_board.py", line 81, in fetch_notices
+    page.goto(board_url, wait_until=self.config.settings.get("wait_until", "networkidle"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\sync_api\_generated.py", line 9054, in goto
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.goto(
+        ^^^^^^^^^^^^^^^^^^^^
+            url=url, timeout=timeout, waitUntil=wait_until, referer=referer
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 153, in goto
+    await self._channel.send(
+        "goto", self._navigation_timeout, locals_to_params(locals())
+    )
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\adelie\Desktop\Hygino\1_PROJECT\24_tukorea_annouce_watcher\1_PROJECT_FILE\TUKOREA_announce_watcher\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: Navigation to "https://kpu.kdual.net/BBS/Board/List/S71855C704064" is interrupted by another navigation to "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+Call log:
+  - navigating to "https://kpu.kdual.net/BBS/Board/List/S71855C704064", waiting until "networkidle"
+
