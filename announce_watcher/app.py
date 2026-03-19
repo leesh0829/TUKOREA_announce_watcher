@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 from typing import Sequence
 
 from announce_watcher.config import DEFAULT_CONFIG_PATH, build_site_adapters, ensure_example_config, load_app_config
 from announce_watcher.engine import WatcherEngine
 from announce_watcher.logging_utils import configure_logging
+from announce_watcher.models import Notice
 from announce_watcher.notifier import build_notifier
 from announce_watcher.startup import install_startup, uninstall_startup
 from announce_watcher.storage import SQLiteNoticeStore
@@ -17,6 +19,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--config", default=str(DEFAULT_CONFIG_PATH), help="Path to watcher JSON config file.")
     parser.add_argument("--db-path", default=None, help="Override SQLite DB path.")
     parser.add_argument("--once", action="store_true", help="Run one check cycle and exit.")
+    parser.add_argument("--test-notification", action="store_true", help="Send a test notification and exit.")
     parser.add_argument("--list-sites", action="store_true", help="Print enabled sites from config and exit.")
     parser.add_argument("--install-startup", action="store_true", help="Install Windows Startup launcher.")
     parser.add_argument("--uninstall-startup", action="store_true", help="Remove Windows Startup launcher.")
@@ -54,6 +57,19 @@ def main(argv: Sequence[str] | None = None) -> None:
         run_tray_app()
         return
 
+    notifier = build_notifier(app_config.notifier, logger=logger)
+
+    if args.test_notification:
+        notice = Notice(
+            site_name="test",
+            notice_key="test-notification",
+            title="TUKOREA Announce Watcher Test",
+            url=f"generated://test-notification/{int(datetime.now(timezone.utc).timestamp())}",
+        )
+        notifier.notify_new_notice(notice)
+        print(f"[TEST-NOTIFICATION] Sent via {app_config.notifier.type}")
+        return
+
     db_path = args.db_path or app_config.db_path
     adapters = build_site_adapters(app_config)
 
@@ -65,7 +81,6 @@ def main(argv: Sequence[str] | None = None) -> None:
             print(f"- {adapter.config.name}: {adapter.config.settings.get('board_url', '')}")
         return
 
-    notifier = build_notifier(app_config.notifier, logger=logger)
     store = SQLiteNoticeStore(db_path)
     engine = WatcherEngine(store=store, notifier=notifier)
 
@@ -75,7 +90,12 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     try:
         for adapter in adapters:
-            count = engine.check_site(adapter)
+            try:
+                count = engine.check_site(adapter)
+            except Exception as exc:
+                logger.error("Initial check failed for %s: %s", adapter.config.name, exc)
+                print(f"[CHECK-ERROR] {adapter.config.name}: {exc}")
+                continue
             logger.info("Checked %s: %s new notices", adapter.config.name, count)
             print(f"[CHECK] {adapter.config.name}: {count} new notices")
 

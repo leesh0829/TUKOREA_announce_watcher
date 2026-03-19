@@ -209,6 +209,44 @@ def test_login_raises_clear_error_when_form_stays_visible(monkeypatch: Any) -> N
         raise AssertionError("expected ValueError")
 
 
+def test_login_raises_clear_error_when_redirected_back_to_login_with_error(monkeypatch: Any) -> None:
+    site = SiteConfig(
+        name="kdual-board-1",
+        interval_seconds=300,
+        adapter_type="playwright_login_board",
+        settings={
+            "start_url": "https://kpu.kdual.net/BBS/Board/List/S71855C704064",
+            "login_url": "https://kpu.kdual.net/Account/Index/?returnUrl=https://kpu.kdual.net/BBS/Board/List/S71855C704064",
+            "username": "user-id",
+            "password": "user-password",
+            "username_selector": "#logId, input[name=\"userid\"]",
+            "password_selector": "#logPw, input[name=\"password\"]",
+            "submit_selector": "#btn_Login",
+            "login_timeout_seconds": 20,
+        },
+    )
+    adapter = PlaywrightLoginBoardAdapter(site)
+    page = _FakePage()
+    page.url = "http://kpu.kdual.net/Account/Index/?ErrorMessage=MSG_ERROR_LOGIN"
+    page.selector_counts["#logId, input[name=\"userid\"]"] = 0
+    page.selector_counts["#logPw, input[name=\"password\"]"] = 0
+
+    monkeypatch.setattr(adapter, "_ensure_page", lambda: page)
+    monkeypatch.setattr(adapter, "_submit_click_retry_exceptions", lambda: (RuntimeError,))
+    monkeypatch.setattr(
+        adapter,
+        "_click_submit_button",
+        lambda locator: None,
+    )
+
+    try:
+        adapter.login()
+    except ValueError as exc:
+        assert str(exc) == "Login failed for kdual-board-1: still on login page after submit"
+    else:
+        raise AssertionError("expected ValueError")
+
+
 def test_select_course_context_falls_back_to_main_page_course_link(monkeypatch: Any) -> None:
     site = SiteConfig(
         name="eclass-course-1",

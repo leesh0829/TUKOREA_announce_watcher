@@ -16,6 +16,7 @@ class _BoardAnchorParser(HTMLParser):
         super().__init__()
         self.items: list[tuple[str, str, str]] = []
         self._in_anchor = False
+        self._container_stack: list[str] = []
         self._anchor_href = ""
         self._anchor_text_parts: list[str] = []
         self._current_item_text_parts: list[str] = []
@@ -23,7 +24,8 @@ class _BoardAnchorParser(HTMLParser):
         self._pending_title = ""
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag == "li":
+        if tag in {"li", "tr"}:
+            self._container_stack.append(tag)
             self._current_item_text_parts = []
             self._pending_href = ""
             self._pending_title = ""
@@ -34,7 +36,7 @@ class _BoardAnchorParser(HTMLParser):
 
         attr_map = dict(attrs)
         href = (attr_map.get("href") or "").strip()
-        if "artclView.do" not in href:
+        if "artclView.do" not in href and "/BBS/Board/Read/" not in href:
             return
 
         self._in_anchor = True
@@ -42,7 +44,8 @@ class _BoardAnchorParser(HTMLParser):
         self._anchor_text_parts = []
 
     def handle_data(self, data: str) -> None:
-        self._current_item_text_parts.append(data)
+        if self._container_stack:
+            self._current_item_text_parts.append(data)
         if self._in_anchor:
             self._anchor_text_parts.append(data)
 
@@ -54,13 +57,14 @@ class _BoardAnchorParser(HTMLParser):
             self._anchor_href = ""
             self._anchor_text_parts = []
 
-        if tag == "li":
+        if tag in {"li", "tr"} and self._container_stack:
             context = self._clean_text("".join(self._current_item_text_parts))
             if self._pending_title and self._pending_href:
                 self.items.append((self._pending_href, self._pending_title, context))
             self._current_item_text_parts = []
             self._pending_href = ""
             self._pending_title = ""
+            self._container_stack.pop()
 
     @staticmethod
     def _clean_text(value: str) -> str:
@@ -115,13 +119,22 @@ class TukoreaBoardAdapter(SiteAdapter):
     @staticmethod
     def _extract_published_at(context: str) -> datetime | None:
         match = re.search(r"등록일\s*(\d{4}\.\d{2}\.\d{2})", context)
-        if not match:
-            return None
-        return datetime.strptime(match.group(1), "%Y.%m.%d")
+        if match:
+            return datetime.strptime(match.group(1), "%Y.%m.%d")
+
+        match = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", context)
+        if match:
+            return datetime.strptime(match.group(1), "%Y-%m-%d")
+
+        return None
 
     @staticmethod
     def _extract_notice_key(notice_url: str) -> str:
         path_match = re.search(r"/(\d+)/artclView\.do", notice_url)
+        if path_match:
+            return path_match.group(1)
+
+        path_match = re.search(r"/BBS/Board/Read/[^/]+/(\d+)", notice_url)
         if path_match:
             return path_match.group(1)
 

@@ -71,6 +71,15 @@ announce-watcher --list-sites
 announce-watcher --once
 ```
 
+토스트 알림만 바로 확인하려면:
+
+```bash
+announce-watcher --test-notification
+```
+
+이 명령은 DB 이력이나 실제 새 공지 여부와 무관하게 현재 `notifier` 설정으로 테스트 알림을 1회 전송합니다. Windows 토스트 팝업을 보려면 `watcher_config.json`의 `notifier.type`이 `windows_toast`여야 합니다.
+처음 토스트를 보낼 때는 앱 ID 등록용 시작 메뉴 바로가기를 자동으로 생성한 뒤 알림을 띄웁니다.
+
 ### 5) 상시 실행
 
 ```bash

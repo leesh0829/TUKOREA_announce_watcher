@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 from announce_watcher.sites.tukorea_board import TukoreaBoardAdapter
 
 
@@ -124,13 +126,36 @@ class PlaywrightLoginBoardAdapter(TukoreaBoardAdapter):
         username_selector: str,
         password_selector: str,
     ) -> None:
-        if not self._login_form_still_visible(page, username_selector, password_selector):
-            return
-        if login_url and page.url != login_url:
+        current_url = str(page.url)
+        form_still_visible = self._login_form_still_visible(page, username_selector, password_selector)
+        login_error = self._url_indicates_login_error(current_url)
+        still_on_login_page = self._same_url_ignoring_query(current_url, login_url) if login_url else False
+        if not (form_still_visible or login_error or still_on_login_page):
             return
 
         detail = self._last_dialog_message or "still on login page after submit"
         raise ValueError(f"Login failed for {self.config.name}: {detail}")
+
+    @staticmethod
+    def _url_indicates_login_error(url: str) -> bool:
+        parsed = urlparse(url)
+        return "ErrorMessage=" in parsed.query or "Account/Index" in parsed.path
+
+    @staticmethod
+    def _same_url_ignoring_query(url: str, other_url: str | None) -> bool:
+        if not other_url:
+            return False
+        parsed_url = urlparse(url)
+        parsed_other = urlparse(other_url)
+        return (
+            parsed_url.scheme,
+            parsed_url.netloc,
+            parsed_url.path.rstrip("/"),
+        ) == (
+            parsed_other.scheme,
+            parsed_other.netloc,
+            parsed_other.path.rstrip("/"),
+        )
 
     @staticmethod
     def _click_login_button_if_visible(page, selector: str) -> None:
